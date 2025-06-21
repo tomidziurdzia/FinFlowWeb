@@ -1,25 +1,21 @@
 import { SignUp } from "@clerk/nextjs";
+import Image from "next/image";
 
 export default function SignUpPage() {
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8">
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Crear Cuenta</h1>
-        <p className="text-gray-600 mt-2">
-          Únete a ExpenseFlow y controla tus gastos
-        </p>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4 lg:p-0">
+      <div className="flex w-full max-w-4xl min-h-[500px] h-[500px] overflow-hidden rounded-lg bg-white shadow-lg">
+        <div className="hidden md:block md:w-1/2">
+          <Image
+            src="/logo.png"
+            width={675}
+            height={900}
+            alt="Login image"
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <SignUp />
       </div>
-      <SignUp
-        appearance={{
-          elements: {
-            formButtonPrimary: "bg-blue-600 hover:bg-blue-700 text-sm",
-            card: "shadow-none",
-            headerTitle: "hidden",
-            headerSubtitle: "hidden",
-          },
-        }}
-        redirectUrl="/"
-      />
     </div>
   );
 }

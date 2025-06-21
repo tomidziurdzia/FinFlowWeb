@@ -1,10 +1,8 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   icons: {
@@ -27,7 +25,13 @@ export default function RootLayout({
       }}
     >
       <html lang="es">
-        <body className={inter.className}>{children}</body>
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased font-primary"
+          )}
+        >
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
