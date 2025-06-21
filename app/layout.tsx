@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/layout/sidebar/app-sidebar";
+import Header from "@/components/layout/header/header";
 
 export const metadata: Metadata = {
   icons: {
@@ -17,20 +20,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider
-      appearance={{
-        variables: {
-          colorPrimary: "#3b82f6",
-        },
-      }}
-    >
+    <ClerkProvider>
       <html lang="es">
         <body
           className={cn(
             "min-h-screen bg-background font-sans antialiased font-primary"
           )}
         >
-          {children}
+          <SidebarProvider defaultOpen={true}>
+            <AppSidebar />
+            <SidebarInset>
+              <Header />
+              <div className="p-4 pt-0">{children}</div>
+            </SidebarInset>
+          </SidebarProvider>
         </body>
       </html>
     </ClerkProvider>
