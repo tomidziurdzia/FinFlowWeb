@@ -1,7 +1,50 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
+.font-primary {
+  font-family: "Roboto", sans-serif;
+}
+
+.cl-rootBox {
+  width: 50%;
+}
+
+.cl-cardBox {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 0;
+}
+
+.cl-card {
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.cl-formButtonPrimary {
+  font-size: 14px;
+  text-transform: none;
+  box-shadow: none !important;
+  background-color: var(--primary);
+}
+
+.cl-formButtonPrimary:hover {
+  background-color: var(--primary);
+  opacity: 0.8;
+}
+
+.cl-buttonArrowIcon {
+  display: none;
+}
+
+.cl-internal-1dauvpw {
+  display: none;
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -51,8 +94,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: hsl(155, 100%, 29%);
+  --primary-foreground: hsl(0 0% 98%);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
