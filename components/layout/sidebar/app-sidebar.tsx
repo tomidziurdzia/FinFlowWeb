@@ -16,7 +16,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-2 py-2 text-sidebar-accent-foreground">
           <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
             <Image
-              src="/Jota.png"
+              src="/logo.png"
               width={675}
               height={900}
               alt="Login image"
@@ -24,8 +24,8 @@ export function AppSidebar() {
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">Transporte Jouve</span>
-            <span className="truncate text-xs">Logistica y Distribucion</span>
+            <span className="truncate font-semibold">FinFlow</span>
+            <span className="truncate text-xs">Finanzas Personales</span>
           </div>
         </div>
       </SidebarHeader>
