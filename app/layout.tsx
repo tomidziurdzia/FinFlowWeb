@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 export const metadata: Metadata = {
   icons: {
@@ -24,7 +25,7 @@ export default function RootLayout({
             "min-h-screen bg-background font-sans antialiased font-primary"
           )}
         >
-          {children}
+          <QueryProvider>{children}</QueryProvider>
         </body>
       </html>
     </ClerkProvider>
