@@ -1,9 +1,10 @@
 "use client";
 
-import { useCategories, useDeleteCategory } from "@/hooks/use-categories";
+import { useState } from "react";
+import { useCategories } from "@/hooks/use-categories";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Edit } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -23,6 +24,8 @@ import {
   CATEGORY_TYPE_LABELS,
   CATEGORY_TYPE_COLORS,
 } from "@/constants/categories";
+import { AddCategoryModal } from "./add-category-modal";
+import { DeleteCategoryModal } from "./delete-category-modal";
 
 interface Category {
   id: string;
@@ -34,7 +37,27 @@ interface Category {
 
 export function CategoriesTable() {
   const { data: categories, isLoading, error } = useCategories();
-  const deleteCategory = useDeleteCategory();
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    category: Category | null;
+  }>({
+    isOpen: false,
+    category: null,
+  });
+
+  const handleDeleteClick = (category: Category) => {
+    setDeleteModal({
+      isOpen: true,
+      category,
+    });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      category: null,
+    });
+  };
 
   const columns: ColumnDef<Category>[] = [
     {
@@ -87,25 +110,28 @@ export function CategoriesTable() {
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            const category = row.original;
-            if (
-              confirm(
-                `Are you sure you want to delete the category "${category.name}"?`
-              )
-            ) {
-              deleteCategory.mutate(category.id);
-            }
-          }}
-          disabled={deleteCategory.isPending}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      ),
+      cell: ({ row }) => {
+        const category = row.original;
+        return (
+          <div className="flex space-x-1">
+            <AddCategoryModal
+              category={category}
+              trigger={
+                <Button variant="ghost" size="sm">
+                  <Edit className="h-4 w-4" />
+                </Button>
+              }
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleDeleteClick(category)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -141,7 +167,10 @@ export function CategoriesTable() {
                     <Skeleton className="h-4 w-20" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-8 w-8" />
+                    <div className="flex space-x-1">
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -171,47 +200,61 @@ export function CategoriesTable() {
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No categories.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No categories.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <DeleteCategoryModal
+        category={deleteModal.category}
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+      />
+    </>
   );
 }
