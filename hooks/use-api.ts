@@ -11,7 +11,9 @@ export function useApiCall() {
 
   const apiCall = useCallback(
     async (endpoint: string, options: RequestInit = {}) => {
-      const token = await getToken();
+      const token = await getToken({
+        template: "long_lived_api",
+      });
 
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
