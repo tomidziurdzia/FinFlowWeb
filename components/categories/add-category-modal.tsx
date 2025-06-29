@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useCreateCategory } from "@/hooks/use-categories";
+import { useState, useEffect } from "react";
+import { useCreateCategory, useUpdateCategory } from "@/hooks/use-categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Loader2, Search } from "lucide-react";
+import { Plus, Loader2, Search, Edit } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { CATEGORY_ICONS, POPULAR_ICONS, searchIcons } from "@/constants/icons";
 import { CATEGORY_COLORS, DEFAULT_CATEGORY_COLOR } from "@/constants/colors";
@@ -30,7 +30,20 @@ const ICON_CATEGORIES = {
   misc: "Others",
 } as const;
 
-export function AddCategoryModal() {
+interface Category {
+  id: string;
+  name: string;
+  type: "expense" | "income" | "investment";
+  color: string;
+  icon: string;
+}
+
+interface AddCategoryModalProps {
+  category?: Category;
+  trigger?: React.ReactNode;
+}
+
+export function AddCategoryModal({ category, trigger }: AddCategoryModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [iconSearch, setIconSearch] = useState("");
   const [selectedIconCategory, setSelectedIconCategory] =
@@ -43,32 +56,68 @@ export function AddCategoryModal() {
   });
 
   const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const isEditing = !!category;
 
-    if (!formData.name.trim()) {
-      alert("Please enter a name for the category");
-      return;
-    }
-
-    try {
-      await createCategory.mutateAsync(formData);
-
+  useEffect(() => {
+    if (category) {
+      setFormData({
+        name: category.name,
+        type: category.type,
+        color: category.color,
+        icon: category.icon,
+      });
+    } else {
       setFormData({
         name: "",
         type: "expense",
         color: DEFAULT_CATEGORY_COLOR as string,
         icon: "ShoppingCart",
       });
+    }
+  }, [category]);
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      type: "expense",
+      color: DEFAULT_CATEGORY_COLOR as string,
+      icon: "ShoppingCart",
+    });
+    setIconSearch("");
+    setSelectedIconCategory("popular");
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      resetForm();
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.name.trim()) {
+      return;
+    }
+
+    try {
+      if (isEditing && category) {
+        await updateCategory.mutateAsync({
+          id: category.id,
+          ...formData,
+        });
+      } else {
+        await createCategory.mutateAsync(formData);
+      }
+
+      resetForm();
       setIsOpen(false);
     } catch (error) {
-      console.error("Error creating category:", error);
-      alert(
-        `Error creating category: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      // Error is handled by the mutation hooks with toasts
+      console.error("Error saving category:", error);
     }
   };
 
@@ -91,17 +140,25 @@ export function AddCategoryModal() {
   const firstRowColors = CATEGORY_COLORS.slice(0, 8);
   const secondRowColors = CATEGORY_COLORS.slice(8, 16);
 
+  const defaultTrigger = isEditing ? (
+    <Button variant="ghost" size="sm">
+      <Edit className="h-4 w-4" />
+    </Button>
+  ) : (
+    <Button>
+      <Plus className="h-4 w-4 mr-2" />
+      Add Category
+    </Button>
+  );
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Category
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>New Category</DialogTitle>
+          <DialogTitle>
+            {isEditing ? "Edit Category" : "New Category"}
+          </DialogTitle>
         </DialogHeader>
         <div className="mt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -238,14 +295,16 @@ export function AddCategoryModal() {
             <div className="flex space-x-2 pt-4">
               <Button
                 type="submit"
-                disabled={createCategory.isPending}
+                disabled={createCategory.isPending || updateCategory.isPending}
                 className="flex-1"
               >
-                {createCategory.isPending ? (
+                {createCategory.isPending || updateCategory.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
+                    {isEditing ? "Updating..." : "Saving..."}
                   </>
+                ) : isEditing ? (
+                  "Update Category"
                 ) : (
                   "Save Category"
                 )}
@@ -253,8 +312,8 @@ export function AddCategoryModal() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsOpen(false)}
-                disabled={createCategory.isPending}
+                onClick={() => handleOpenChange(false)}
+                disabled={createCategory.isPending || updateCategory.isPending}
               >
                 Cancel
               </Button>

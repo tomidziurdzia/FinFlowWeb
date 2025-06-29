@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   icons: {
@@ -26,6 +27,7 @@ export default function RootLayout({
           )}
         >
           <QueryProvider>{children}</QueryProvider>
+          <Toaster position="top-right" richColors />
         </body>
       </html>
     </ClerkProvider>
