@@ -30,19 +30,6 @@ export const navItems: NavItem[] = [
     url: "/transactions",
     icon: "arrowLeftRight",
     isActive: true,
-    items: [
-      {
-        title: "Income",
-        url: "/incomes",
-        icon: "banknoteArrowUp",
-        shortcut: ["v", "v"],
-      },
-      {
-        title: "Expenses",
-        shortcut: ["s", "s"],
-        url: "/expenses",
-        icon: "banknoteArrowDown",
-      },
-    ],
+    items: [],
   },
 ];
