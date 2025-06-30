@@ -1,5 +1,6 @@
 import { WalletsTable } from "@/components/wallets/wallets-table";
 import { AddWalletModal } from "@/components/wallets/add-wallet-modal";
+import { TransferBetweenWalletsModal } from "@/components/wallets/transfer-between-wallets-modal";
 
 export default function WalletsPage() {
   return (
@@ -11,7 +12,10 @@ export default function WalletsPage() {
             Organize your finances by wallets
           </p>
         </div>
-        <AddWalletModal />
+        <div className="flex gap-2">
+          <AddWalletModal />
+          <TransferBetweenWalletsModal />
+        </div>
       </div>
       <WalletsTable />
     </div>
